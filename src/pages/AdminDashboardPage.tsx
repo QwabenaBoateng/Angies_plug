@@ -168,7 +168,6 @@ export const AdminDashboardPage: React.FC = () => {
 		}
 		setPendingUrl(null);
 		setHeroImages(loadHeroImages());
-		setManagerRefresh((v) => v + 1);
 		alert('Saved. It will appear in the selected section on the site.');
 	}
 
@@ -202,7 +201,6 @@ export const AdminDashboardPage: React.FC = () => {
 										<a href={`/admin/section/${s}`} onClick={(e) => {
 											e.preventDefault();
 											window.history.pushState({}, '', `/admin/section/${s}`);
-											setManagerCategory((s as any) === 'hero' ? 'featured' : (s as any));
 											// Let routing layer render the section page
 											location.assign(`/admin/section/${s}`);
 										}}>{s}</a>
