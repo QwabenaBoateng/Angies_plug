@@ -2,6 +2,7 @@ import { Product, ProductCategory } from '../types/product';
 import { addHeroImage } from './heroStore';
 
 const STORAGE_KEY = 'angies_plug_products_v1';
+const BRANDS_KEY = 'angies_plug_brands_v1';
 
 export function loadProducts(): Product[] {
 	try {
@@ -76,6 +77,34 @@ export function toggleOutOfStock(productId: string): void {
 	if (idx === -1) return;
 	all[idx].outOfStock = !all[idx].outOfStock;
 	saveProducts(all);
+}
+
+// Brands storage
+export type BrandItem = { id: string; label: string; imageUrl: string; createdAt: number };
+
+export function loadBrands(): BrandItem[] {
+	try {
+		const raw = localStorage.getItem(BRANDS_KEY);
+		return raw ? (JSON.parse(raw) as BrandItem[]) : [];
+	} catch {
+		return [];
+	}
+}
+
+export function saveBrands(items: BrandItem[]): void {
+	localStorage.setItem(BRANDS_KEY, JSON.stringify(items));
+}
+
+export function addBrand(input: { label: string; imageUrl: string }): BrandItem {
+	const item: BrandItem = { id: crypto.randomUUID(), label: input.label, imageUrl: input.imageUrl, createdAt: Date.now() };
+	const all = loadBrands();
+	all.unshift(item);
+	saveBrands(all);
+	return item;
+}
+
+export function deleteBrand(id: string): void {
+	saveBrands(loadBrands().filter(b => b.id !== id));
 }
 
 
