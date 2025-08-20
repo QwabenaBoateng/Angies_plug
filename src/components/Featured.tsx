@@ -1,6 +1,7 @@
 import React from 'react';
 import { formatCurrencyGHS } from '../lib/formatCurrency';
 import { getProductsByCategory } from '../store/contentStore';
+import { addToCart } from '../store/cartStore';
 
 type Product = {
 	id: string;
@@ -61,12 +62,6 @@ export const Featured: React.FC = () => {
 							</div>
 							<div className="p-4 text-sm">
 								<h3 className="font-medium line-clamp-2 min-h-[2.5rem]">{p.name}</h3>
-								<div className="mt-2 flex items-center justify-between">
-									<span className="font-semibold">{formatCurrencyGHS(p.price)}</span>
-									<button className={`text-xs px-3 py-2 border border-black/10 rounded-md transition ${p.outOfStock ? 'opacity-50 cursor-not-allowed' : 'hover:bg-black hover:text-white'}`} disabled={p.outOfStock}>
-										{p.outOfStock ? 'Out of Stock' : 'Add to Cart'}
-									</button>
-								</div>
 							</div>
 						</article>
 					))}

@@ -3,6 +3,7 @@ import { Navigate } from 'react-router-dom';
 import { isAuthenticated, logout } from '../auth/auth';
 import { formatCurrencyGHS } from '../lib/formatCurrency';
 import { addProduct } from '../store/contentStore';
+import { addBrand } from '../store/contentStore';
 import type { Product } from '../types/product';
 import { loadHeroImages, removeHeroImage } from '../store/heroStore';
 
@@ -106,7 +107,8 @@ export const AdminDashboardPage: React.FC = () => {
 	const [pendingUrl, setPendingUrl] = useState<string | null>(null);
 	const [formName, setFormName] = useState('');
 	const [formPrice, setFormPrice] = useState('');
-	const [formCategory, setFormCategory] = useState<Product['category']>('featured');
+	type UiCategory = Product['category'] | 'brand';
+	const [formCategory, setFormCategory] = useState<UiCategory>('featured');
 	const [uploadMode, setUploadMode] = useState<'product' | 'hero'>('product');
 	const [heroImages, setHeroImages] = useState<string[]>(loadHeroImages());
 	const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -155,11 +157,15 @@ export const AdminDashboardPage: React.FC = () => {
 		e.preventDefault();
 		if (!pendingUrl) return;
 		const priceNum = Number(formPrice);
-		if (formCategory !== 'hero' && (!formName || Number.isNaN(priceNum))) {
+		if (formCategory !== 'hero' && formCategory !== 'brand' && (!formName || Number.isNaN(priceNum))) {
 			alert('Please enter a name and numeric price.');
 			return;
 		}
-		addProduct({ name: formName || 'Hero Slide', price: Number.isNaN(priceNum) ? 0 : priceNum, imageUrl: pendingUrl, category: formCategory });
+		if (formCategory === 'brand') {
+			addBrand({ label: formName || 'Brand', imageUrl: pendingUrl });
+		} else {
+			addProduct({ name: formName || 'Hero Slide', price: Number.isNaN(priceNum) ? 0 : priceNum, imageUrl: pendingUrl, category: formCategory });
+		}
 		setPendingUrl(null);
 		setHeroImages(loadHeroImages());
 		setManagerRefresh((v) => v + 1);
@@ -334,12 +340,13 @@ export const AdminDashboardPage: React.FC = () => {
 							<form onSubmit={saveUploadedProduct} className="space-y-3">
 								<input value={formName} onChange={(e)=>setFormName(e.target.value)} placeholder="Product name" className="w-full h-10 border border-black/10 rounded px-3" />
 								<input value={formPrice} onChange={(e)=>setFormPrice(e.target.value)} placeholder="Price (number)" className="w-full h-10 border border-black/10 rounded px-3" />
-								<select value={formCategory} onChange={(e)=>setFormCategory(e.target.value as Product['category'])} className="w-full h-10 border border-black/10 rounded px-3 bg-white">
+								<select value={formCategory} onChange={(e)=>setFormCategory(e.target.value as UiCategory)} className="w-full h-10 border border-black/10 rounded px-3 bg-white">
 									<option value="featured">Featured</option>
 									<option value="accessories">Accessories</option>
 									<option value="mens">Mens</option>
 									<option value="womens">Womens</option>
 									<option value="hero">Hero (homepage background)</option>
+									<option value="brand">Brand (labels section)</option>
 								</select>
 								<div className="flex gap-3 pt-2">
 									<button type="submit" className="h-10 px-4 rounded bg-black text-white">Save</button>
