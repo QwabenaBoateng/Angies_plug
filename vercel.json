@@ -6,6 +6,10 @@
   "devCommand": "npm run dev",
   "env": {
     "NODE_VERSION": "18"
-  }
+  },
+  "rewrites": [
+    { "source": "/admin", "destination": "/admin.html" },
+    { "source": "/admin/(.*)", "destination": "/admin.html" }
+  ]
 }
 

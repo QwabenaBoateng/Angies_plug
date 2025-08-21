@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 import { isAuthenticated, logout } from '../auth/auth';
 import { formatCurrencyGHS } from '../lib/formatCurrency';
 import { addProduct } from '../store/contentStore';
@@ -103,6 +103,7 @@ export const AdminDashboardPage: React.FC = () => {
 		return <Navigate to="/login" replace />;
 	}
 
+	const navigate = useNavigate();
 	const [productsOpen, setProductsOpen] = useState(false);
 	const [pendingUrl, setPendingUrl] = useState<string | null>(null);
 	const [formName, setFormName] = useState('');
@@ -198,12 +199,7 @@ export const AdminDashboardPage: React.FC = () => {
 							<div className="ml-4 mt-1 space-y-1 text-white/70 text-[13px]">
 								{['hero','womens','mens','featured','accessories'].map((s) => (
 									<div key={s} className={`pl-2 py-1 rounded hover:bg-white/5 capitalize`}>
-										<a href={`/admin/section/${s}`} onClick={(e) => {
-											e.preventDefault();
-											window.history.pushState({}, '', `/admin/section/${s}`);
-											// Let routing layer render the section page
-											location.assign(`/admin/section/${s}`);
-										}}>{s}</a>
+										<a href={`#/section/${s}`} onClick={(e) => { e.preventDefault(); navigate(`/section/${s}`); }}>{s}</a>
 									</div>
 								))}
 							</div>

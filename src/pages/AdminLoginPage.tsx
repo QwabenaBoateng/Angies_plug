@@ -12,7 +12,7 @@ export const AdminLoginPage: React.FC = () => {
 		e.preventDefault();
 		setError(null);
 		if (loginWithCredentials(email, password)) {
-			navigate('/admin', { replace: true });
+			navigate('/', { replace: true });
 		} else {
 			setError('Invalid email or password');
 		}
