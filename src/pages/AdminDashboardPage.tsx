@@ -6,6 +6,7 @@ import { addProduct } from '../store/contentStore';
 import { addBrand } from '../store/contentStore';
 import type { Product } from '../types/product';
 import { loadHeroImages, removeHeroImage } from '../store/heroStore';
+import { uploadImageToSupabase } from '../lib/uploadToSupabase';
 
 const CLOUD_NAME = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME as string | undefined;
 const UPLOAD_PRESET = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET as string | undefined;
@@ -122,36 +123,38 @@ export const AdminDashboardPage: React.FC = () => {
 	function onLocalFileSelected(e: React.ChangeEvent<HTMLInputElement>) {
 		const file = e.target.files?.[0];
 		if (!file) return;
-		const reader = new FileReader();
-		reader.onload = () => {
-			const dataUrl = reader.result as string;
-			setPendingUrl(dataUrl);
-			setFormName(file.name.replace(/\.[^.]+$/, ''));
-			setFormCategory(uploadMode === 'hero' ? 'hero' : 'featured');
-		};
-		reader.readAsDataURL(file);
-		e.target.value = '';
+		setFormName(file.name.replace(/\.[^.]+$/, ''));
+		setFormCategory(uploadMode === 'hero' ? 'hero' : 'featured');
+		// Try Supabase first; if not configured, fallback to data URL preview
+		uploadImageToSupabase(file, uploadMode === 'hero' ? 'hero' : 'products')
+			.then((url) => setPendingUrl(url))
+			.catch(() => {
+				const reader = new FileReader();
+				reader.onload = () => setPendingUrl(reader.result as string);
+				reader.readAsDataURL(file);
+			})
+			.finally(() => { e.target.value = ''; });
 	}
 
 	function openUploadWidget() {
-		if (!CLOUD_NAME || !UPLOAD_PRESET || !window.cloudinary?.createUploadWidget) {
-			chooseLocalFile('product');
-			return;
-		}
-		// @ts-ignore
-		const widget = window.cloudinary.createUploadWidget(
-			{ cloudName: CLOUD_NAME, uploadPreset: UPLOAD_PRESET, folder: 'angies-plug', multiple: false, resourceType: 'image' },
-			(_: unknown, result: any) => {
-				if (result?.event === 'success') {
-					const url: string = result.info.secure_url;
-					setPendingUrl(url);
-					setFormName('');
-					setFormPrice('');
-					setFormCategory('featured');
-				}
+		// Replace cloud widget: use local picker and upload to Supabase storage
+		const input = document.createElement('input');
+		input.type = 'file';
+		input.accept = 'image/*';
+		input.onchange = async () => {
+			const file = input.files?.[0];
+			if (!file) return;
+			try {
+				const url = await uploadImageToSupabase(file, 'products');
+				setPendingUrl(url);
+				setFormName(file.name.replace(/\.[^.]+$/, ''));
+				setFormPrice('');
+				setFormCategory('featured');
+			} catch (e) {
+				alert('Upload failed. Check Supabase configuration (.env).');
 			}
-		);
-		widget?.open?.();
+		};
+		input.click();
 	}
 
 	function saveUploadedProduct(e: React.FormEvent) {
@@ -197,9 +200,16 @@ export const AdminDashboardPage: React.FC = () => {
 						</button>
 						{productsOpen && (
 							<div className="ml-4 mt-1 space-y-1 text-white/70 text-[13px]">
-								{['hero','womens','mens','featured','accessories'].map((s) => (
-									<div key={s} className={`pl-2 py-1 rounded hover:bg-white/5 capitalize`}>
-										<a href={`#/section/${s}`} onClick={(e) => { e.preventDefault(); navigate(`/section/${s}`); }}>{s}</a>
+								{[
+									{ key: 'hero', label: 'Hero' },
+									{ key: 'womens', label: 'Womens' },
+									{ key: 'mens', label: 'Mens' },
+									{ key: 'featured', label: 'Featured' },
+									{ key: 'accessories', label: 'Accessories' },
+									{ key: 'brand', label: 'Brands' },
+								].map((item) => (
+									<div key={item.key} className={`pl-2 py-1 rounded hover:bg-white/5`}>
+										<a href={`#/section/${item.key}`} onClick={(e) => { e.preventDefault(); navigate(`/section/${item.key}`); }}>{item.label}</a>
 									</div>
 								))}
 							</div>
