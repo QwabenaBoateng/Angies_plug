@@ -14,7 +14,7 @@ export const Header: React.FC = () => {
 		<header className="border-b border-black/10">
 			<div className="container py-4 flex items-center justify-between gap-6">
 				<div className="text-2xl font-semibold">Angie's Plug</div>
-				<nav className="hidden md:flex items-center gap-8 text-sm">
+				<nav className="flex items-center gap-8 text-sm">
 					<Link className="font-medium" to="/">Home</Link>
 					<Link to="/shop">Shop</Link>
 					<Link to="/catalog">Catalog</Link>
