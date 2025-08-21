@@ -2,11 +2,11 @@ import React from 'react';
 import { Navigate, useParams } from 'react-router-dom';
 import { isAuthenticated } from '../auth/auth';
 import { loadHeroImages, removeHeroImage } from '../store/heroStore';
-import { getProductsByCategory, migrateHeroFromProducts, updateProduct, deleteProduct, toggleOutOfStock } from '../store/contentStore';
+import { getProductsByCategory, migrateHeroFromProducts, updateProduct, deleteProduct, toggleOutOfStock, loadBrands, deleteBrand } from '../store/contentStore';
 import type { ProductCategory } from '../types/product';
 import { formatCurrencyGHS } from '../lib/formatCurrency';
 
-type Section = 'hero' | 'featured' | 'accessories' | 'mens' | 'womens';
+type Section = 'hero' | 'featured' | 'accessories' | 'mens' | 'womens' | 'brand';
 
 export const AdminSectionPage: React.FC = () => {
     if (!isAuthenticated()) {
@@ -37,6 +37,20 @@ export const AdminSectionPage: React.FC = () => {
                             <div className="p-3 flex items-center justify-between text-sm">
                                 <div>Slide {idx + 1}</div>
                                 <button className="text-red-600" onClick={() => { removeHeroImage(idx); location.reload(); }}>Delete</button>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            ) : sec === 'brand' ? (
+                <div className="mt-6 grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                    {loadBrands().map((b) => (
+                        <div key={b.id} className="bg-white rounded-xl border border-black/10 overflow-hidden relative">
+                            <div className="aspect-[3/4] bg-muted">
+                                <img src={b.imageUrl} alt={b.label} className="w-full h-full object-cover" />
+                            </div>
+                            <div className="p-3 flex items-center justify-between text-sm">
+                                <div className="font-medium">{b.label}</div>
+                                <button className="h-9 px-3 rounded border border-black/10" onClick={()=>{ deleteBrand(b.id); location.reload(); }}>Delete</button>
                             </div>
                         </div>
                     ))}

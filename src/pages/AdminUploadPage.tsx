@@ -2,6 +2,7 @@ import React from 'react';
 import { logout, isAuthenticated } from '../auth/auth';
 import { Navigate } from 'react-router-dom';
 import { addBrand, loadBrands, deleteBrand } from '../store/contentStore';
+import { uploadImageToSupabase } from '../lib/uploadToSupabase';
 
 declare global {
 	interface Window {
@@ -23,27 +24,24 @@ export const AdminUploadPage: React.FC = () => {
 			alert('Enter a brand name before uploading.');
 			return;
 		}
-		if (!window.cloudinary) {
-			alert('Cloudinary widget not loaded.');
-			return;
-		}
-		const widget = window.cloudinary.createUploadWidget(
-			{
-				cloudName: 'YOUR_CLOUD_NAME',
-				uploadPreset: 'YOUR_UNSIGNED_PRESET',
-				folder: 'angies-plug',
-				multiple: true,
-				maxFiles: 10,
-			},
-			(_: unknown, result: any) => {
-				if (result?.event === 'success') {
-					const url: string = result.info.secure_url;
+		// If Supabase configured, use local file picker and upload to Supabase
+		const input = document.createElement('input');
+		input.type = 'file';
+		input.accept = 'image/*';
+		input.multiple = true;
+		input.onchange = async () => {
+			const files = Array.from(input.files || []);
+			for (const f of files) {
+				try {
+					const url = await uploadImageToSupabase(f, 'brands');
 					addBrand({ label: brandLabel.trim(), imageUrl: url });
-					refresh();
+				} catch (err) {
+					alert('Upload failed. Check Supabase configuration.');
 				}
 			}
-		);
-		widget.open();
+			refresh();
+		};
+		input.click();
 	}
 
 	return (
