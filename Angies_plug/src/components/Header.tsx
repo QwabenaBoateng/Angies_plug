@@ -1,6 +1,7 @@
 import React from 'react';
 
 export const Header: React.FC = () => {
+	const [open, setOpen] = React.useState(false);
 	return (
 		<header className="border-b border-black/10">
 			<div className="bg-black text-white text-xs">
@@ -12,15 +13,18 @@ export const Header: React.FC = () => {
 					</div>
 				</div>
 			</div>
-			<div className="container py-4 flex items-center justify-between gap-6">
+			<div className="container py-4 flex flex-wrap items-center justify-between gap-3">
 				<div className="text-2xl font-semibold">Angie's Plug</div>
-				<nav className="flex items-center gap-8 text-sm">
+				<button onClick={()=>setOpen(v=>!v)} className="sm:hidden p-2 rounded hover:bg-black/5" aria-label="menu">
+					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" className="w-6 h-6"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+				</button>
+				<nav className={`text-sm w-full order-3 sm:order-none sm:w-auto ${open ? 'flex' : 'hidden'} sm:flex items-center gap-8 sm:justify-start justify-center`}>
 					<a className="font-medium" href="#">Home</a>
 					<a href="#">Shop</a>
 					<a href="#">Catalog</a>
 					<a href="#">Contact</a>
 				</nav>
-				<div className="ml-auto flex items-center gap-4">
+				<div className="ml-auto sm:ml-0 flex items-center gap-4">
 					<button aria-label="search" className="p-2 rounded-full hover:bg-black/5">
 						<span className="i-search" />
 						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" className="w-5 h-5"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
