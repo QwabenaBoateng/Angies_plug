@@ -15,16 +15,16 @@ export const Header: React.FC = () => {
 			</div>
 			<div className="container py-4 flex flex-wrap items-center justify-between gap-3">
 				<div className="text-2xl font-semibold">Angie's Plug</div>
-				<button onClick={()=>setOpen(v=>!v)} className="sm:hidden p-2 rounded hover:bg-black/5" aria-label="menu">
+				<button onClick={()=>setOpen(v=>!v)} className="sm:hidden p-2 rounded hover:bg-black/5 ml-auto" aria-label="menu">
 					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" className="w-6 h-6"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
 				</button>
-				<nav className={`text-sm w-full order-3 sm:order-none sm:w-auto ${open ? 'flex' : 'hidden'} sm:flex items-center gap-8 sm:justify-start justify-center`}>
+				<nav className={`${open ? 'flex' : 'hidden'} sm:flex absolute sm:relative left-0 right-0 top-full sm:top-auto bg-white sm:bg-transparent border-b border-black/10 sm:border-0 p-4 sm:p-0 flex-col sm:flex-row items-center gap-4 sm:gap-8 text-sm justify-center sm:justify-start`}>
 					<a className="font-medium" href="#">Home</a>
 					<a href="#">Shop</a>
 					<a href="#">Catalog</a>
 					<a href="#">Contact</a>
 				</nav>
-				<div className="ml-auto sm:ml-0 flex items-center gap-4">
+				<div className="ml-auto hidden sm:flex items-center gap-4">
 					<button aria-label="search" className="p-2 rounded-full hover:bg-black/5">
 						<span className="i-search" />
 						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" className="w-5 h-5"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
