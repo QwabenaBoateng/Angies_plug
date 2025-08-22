@@ -128,7 +128,9 @@ export const AdminDashboardPage: React.FC = () => {
 		// Try Supabase first; if not configured, fallback to data URL preview
 		uploadImageToSupabase(file, uploadMode === 'hero' ? 'hero' : 'products')
 			.then((url) => setPendingUrl(url))
-			.catch(() => {
+			.catch((err: any) => {
+				const message = err?.message || String(err);
+				alert(`Upload failed: ${message}`);
 				const reader = new FileReader();
 				reader.onload = () => setPendingUrl(reader.result as string);
 				reader.readAsDataURL(file);
@@ -150,8 +152,9 @@ export const AdminDashboardPage: React.FC = () => {
 				setFormName(file.name.replace(/\.[^.]+$/, ''));
 				setFormPrice('');
 				setFormCategory('featured');
-			} catch (e) {
-				alert('Upload failed. Check Supabase configuration (.env).');
+			} catch (e: any) {
+				const message = e?.message || String(e);
+				alert(`Upload failed: ${message}`);
 			}
 		};
 		input.click();

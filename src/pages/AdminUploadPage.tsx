@@ -35,8 +35,9 @@ export const AdminUploadPage: React.FC = () => {
 				try {
 					const url = await uploadImageToSupabase(f, 'brands');
 					addBrand({ label: brandLabel.trim(), imageUrl: url });
-				} catch (err) {
-					alert('Upload failed. Check Supabase configuration.');
+				} catch (err: any) {
+					const message = err?.message || String(err);
+					alert(`Upload failed: ${message}`);
 				}
 			}
 			refresh();
