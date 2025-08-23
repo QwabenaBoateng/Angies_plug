@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 const categories = [
 	{ title: "Women's Wear", subtitle: 'New arrivals', icon: '👗', anchor: 'womens' },
 	{ title: 'Accessories', subtitle: 'New season', icon: '🎩', anchor: 'accessories' },
-	{ title: "Men's Wear", subtitle: 'Best offers', icon: '👜', anchor: 'mens' },
+	{ title: "Men's Wear", subtitle: 'Best offers', icon: '👔', anchor: 'mens' },
 	{ title: 'Footwear', subtitle: 'Coming Soon', icon: '👟', anchor: 'footwear' },
 ];
 
