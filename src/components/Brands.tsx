@@ -32,7 +32,7 @@ export const Brands: React.FC = () => {
 		<section className="py-12">
 			<div className="container">
 				<h2 className="text-center text-3xl md:text-5xl font-semibold tracking-tight">The biggest labels</h2>
-				<div className="mt-8 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+				<div className="mt-8 grid grid-cols-2 md:grid-cols-4 gap-6">
 					{list.map((b) => (
 						<div key={b.label} className="relative rounded-xl overflow-hidden border border-black/10">
 							<div className="aspect-[3/4]">

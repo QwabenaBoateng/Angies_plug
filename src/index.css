@@ -6,6 +6,17 @@
 	--container: 1140px;
 }
 
+/* Prevent horizontal scrolling and make media responsive */
+html, body {
+	max-width: 100%;
+	overflow-x: hidden;
+}
+img, video, canvas, iframe {
+	max-width: 100%;
+	height: auto;
+	display: block;
+}
+
 .container {
 	@apply max-w-[var(--container)] mx-auto px-4;
 }

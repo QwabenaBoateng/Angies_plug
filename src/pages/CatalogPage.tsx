@@ -2,9 +2,10 @@ import React from 'react';
 import { loadProducts } from '../store/contentStore';
 import { formatCurrencyGHS } from '../lib/formatCurrency';
 import { addToCart } from '../store/cartStore';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 
 export const CatalogPage: React.FC = () => {
+	const location = useLocation();
 	const all = React.useMemo(() => loadProducts().filter(p => p.category !== 'hero' && p.category !== 'featured'), []);
 	const groups = React.useMemo(() => {
 		const map = new Map<string, typeof all>();
@@ -15,6 +16,19 @@ export const CatalogPage: React.FC = () => {
 		}
 		return Array.from(map.entries());
 	}, [all]);
+
+	// Scroll to section when visiting /catalog#<anchor>
+	React.useEffect(() => {
+		if (!location.hash) return;
+		const id = location.hash.replace('#', '');
+		// Defer to ensure sections are rendered
+		setTimeout(() => {
+			const el = document.getElementById(id);
+			if (el) {
+				el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+			}
+		}, 0);
+	}, [location.hash]);
 
 	return (
 		<main className="container py-8">
@@ -166,7 +180,7 @@ export const CatalogPage: React.FC = () => {
 					{/* Render remaining categories except 'mens' */}
 					{/* Render remaining categories except 'mens', 'womens', 'accessories' */}
 					{groups.filter(([category]) => category !== 'mens' && category !== 'womens' && category !== 'accessories').map(([category, products]) => (
-						<section key={category}>
+						<section key={category} id={category}>
 							<h2 className="text-sm tracking-[0.2em] font-medium uppercase">{category}</h2>
 							<div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-6">
 								{products.map((p) => (
