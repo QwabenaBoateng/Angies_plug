@@ -1,10 +1,12 @@
 import { supabase } from './supabaseClient';
 
 export async function listProductsByCategory(category: string) {
+  const variants = [category, category.toUpperCase(), category.charAt(0).toUpperCase() + category.slice(1)];
+  const orExpr = variants.map(v => `category.eq.${v}`).join(',');
   const { data, error } = await supabase!
     .from('products')
     .select('*')
-    .eq('category', category)
+    .or(orExpr)
     .order('created_at', { ascending: false });
   if (error) throw error;
   return data;

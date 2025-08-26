@@ -6,6 +6,7 @@ import { addBrand } from '../store/contentStore';
 import type { Product } from '../types/product';
 import { loadHeroImages } from '../store/heroStore';
 import { uploadImageToSupabase } from '../lib/uploadToSupabase';
+import { createProduct, createBrand, addHeroImage as dbAddHeroImage } from '../lib/db';
 
 // Removed demo CardProduct grid data
 
@@ -70,7 +71,7 @@ export const AdminDashboardPage: React.FC = () => {
 		input.click();
 	}
 
-	function saveUploadedProduct(e: React.FormEvent) {
+	async function saveUploadedProduct(e: React.FormEvent) {
 		e.preventDefault();
 		if (!pendingUrl) return;
 		const priceNum = Number(formPrice);
@@ -78,10 +79,13 @@ export const AdminDashboardPage: React.FC = () => {
 			alert('Please enter a name and numeric price.');
 			return;
 		}
+		// Persist to Supabase DB so site can read it
 		if (formCategory === 'brand') {
-			addBrand({ label: formName || 'Brand', imageUrl: pendingUrl });
+			await createBrand({ label: formName || 'Brand', imageUrl: pendingUrl });
+		} else if (formCategory === 'hero') {
+			await dbAddHeroImage(pendingUrl);
 		} else {
-			addProduct({ name: formName || 'Hero Slide', price: Number.isNaN(priceNum) ? 0 : priceNum, imageUrl: pendingUrl, category: formCategory });
+			await createProduct({ name: formName || 'Hero Slide', price: Number.isNaN(priceNum) ? 0 : priceNum, imageUrl: pendingUrl, category: formCategory });
 		}
 		setPendingUrl(null);
 		setHeroImages(loadHeroImages());

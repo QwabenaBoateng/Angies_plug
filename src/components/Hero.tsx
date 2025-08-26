@@ -1,35 +1,41 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { loadHeroImages } from '../store/heroStore';
+import { listHeroImages } from '../lib/db';
 
 export const Hero: React.FC = () => {
 	// Read hero slides from storage; memo to avoid re-reading on every render
 	const slides = useMemo(() => {
-		const uploaded = loadHeroImages();
-		return uploaded.length
-			? uploaded
-			: [
-				'https://images.unsplash.com/photo-1528701800489-20be3c2ea4a0?q=80&w=1600&auto=format&fit=crop',
-			];
+		return [
+			'https://images.unsplash.com/photo-1528701800489-20be3c2ea4a0?q=80&w=1600&auto=format&fit=crop',
+		];
 	}, []);
 
 	const [index, setIndex] = useState(0);
+	const [remoteSlides, setRemoteSlides] = useState<string[]>(slides);
 
-	const goPrev = () => setIndex((i) => (i - 1 + slides.length) % slides.length);
-	const goNext = () => setIndex((i) => (i + 1) % slides.length);
+	useEffect(() => {
+		listHeroImages()
+			.then((arr) => {
+				if (arr && arr.length) setRemoteSlides(arr);
+			})
+			.catch(console.error);
+	}, []);
+
+	const goPrev = () => setIndex((i) => (i - 1 + remoteSlides.length) % remoteSlides.length);
+	const goNext = () => setIndex((i) => (i + 1) % remoteSlides.length);
 
 	// Auto-play
 	useEffect(() => {
-		if (slides.length <= 1) return;
+		if (remoteSlides.length <= 1) return;
 		const id = setInterval(goNext, 5000);
 		return () => clearInterval(id);
-	}, [slides.length]);
+	}, [remoteSlides.length]);
 
 	return (
 		<section className="relative">
 			<div className="container">
 				<div className="relative h-[520px] overflow-hidden rounded-lg bg-muted">
 					<img
-						src={slides[index]}
+						src={remoteSlides[index]}
 						alt="Fashion Hero"
 						loading="eager"
 						decoding="sync"
@@ -51,9 +57,9 @@ export const Hero: React.FC = () => {
 						</div>
 					</div>
 					{/* Dots */}
-					{slides.length > 1 && (
+					{remoteSlides.length > 1 && (
 						<div className="absolute bottom-4 left-10 z-10 flex gap-2">
-							{slides.map((_, i) => (
+							{remoteSlides.map((_, i) => (
 								<button key={i} onClick={() => setIndex(i)} className={`w-2.5 h-2.5 rounded-full ${i === index ? 'bg-black' : 'bg-black/30'}`} aria-label={`Go to slide ${i + 1}`} />
 							))}
 						</div>

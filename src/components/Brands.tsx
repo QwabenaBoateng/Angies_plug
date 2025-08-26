@@ -1,5 +1,5 @@
-import React from 'react';
-import { loadBrands } from '../store/contentStore';
+import React, { useEffect, useState } from 'react';
+import { listBrands } from '../lib/db';
 
 type BrandCard = {
 	label: string;
@@ -26,8 +26,17 @@ const brands: BrandCard[] = [
 ];
 
 export const Brands: React.FC = () => {
-    const uploaded = loadBrands();
-    const list: BrandCard[] = uploaded.length ? uploaded.slice(0, 4).map(b => ({ label: b.label, image: b.imageUrl })) : brands;
+	const [list, setList] = useState<BrandCard[]>(brands);
+
+	useEffect(() => {
+		listBrands()
+			.then((rows: any[]) => {
+				if (rows && rows.length) {
+					setList(rows.slice(0, 4).map(r => ({ label: r.label, image: r.image_url })));
+				}
+			})
+			.catch(console.error);
+	}, []);
 	return (
 		<section className="py-12">
 			<div className="container">
