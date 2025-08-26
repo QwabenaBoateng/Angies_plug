@@ -1,17 +1,15 @@
-import React from 'react';
-import { formatCurrencyGHS } from '../lib/formatCurrency';
-import { getProductsByCategory } from '../store/contentStore';
-import { addToCart } from '../store/cartStore';
+import React, { useEffect, useState } from 'react';
+import { listProductsByCategory } from '../lib/db';
 
-type Product = {
+ type Product = {
 	id: string;
 	name: string;
 	price: number;
 	image: string;
 	outOfStock?: boolean;
-};
+ };
 
-const seedProducts: Product[] = [
+ const seedProducts: Product[] = [
 	{
 		id: 'p1',
 		name: 'Classic Polo Shirt',
@@ -40,11 +38,27 @@ const seedProducts: Product[] = [
 		image:
 			'https://images.unsplash.com/photo-1520974722078-4c22a04d4e6e?q=80&w=800&auto=format&fit=crop',
 	},
-];
+ ];
 
-export const Featured: React.FC = () => {
-	const uploaded = getProductsByCategory('featured');
-	const products: Product[] = uploaded.length ? uploaded.map(p => ({ id: p.id, name: p.name, price: p.price, image: p.imageUrl, outOfStock: (p as any).outOfStock })) : seedProducts;
+ export const Featured: React.FC = () => {
+	const [products, setProducts] = useState<Product[]>(seedProducts);
+
+	useEffect(() => {
+		listProductsByCategory('featured')
+			.then((rows: any[]) => {
+				if (rows && rows.length) {
+					setProducts(rows.map(r => ({
+						id: r.id,
+						name: r.name,
+						price: Number(r.price),
+						image: r.image_url,
+						outOfStock: !!r.out_of_stock,
+					})));
+				}
+			})
+			.catch(console.error);
+	}, []);
+
 	return (
 		<section className="py-12">
 			<div className="container">
@@ -69,6 +83,6 @@ export const Featured: React.FC = () => {
 			</div>
 		</section>
 	);
-};
+ };
 
 

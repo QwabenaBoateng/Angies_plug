@@ -1,3 +1,7 @@
+Add these to your environment (local .env.local and Vercel Project Settings → Environment Variables):
+
 VITE_SUPABASE_URL=https://cidmjjbfdvkifxhdjvvm.supabase.co
 VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNpZG1qamJmZHZraWZ4aGRqdnZtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYyMTkxMjIsImV4cCI6MjA3MTc5NTEyMn0.Bs2CE9VeDNAsmnoBox5nc_096hGlorvvUL05RVLJgWI
 VITE_SUPABASE_BUCKET=angies-plug
+
+Note: Do not commit .env.local to source control. On Vercel, add these in both Preview and Production, then redeploy.
