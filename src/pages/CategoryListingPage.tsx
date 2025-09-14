@@ -1,14 +1,39 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
-import { loadProducts } from '../store/contentStore';
+import { listProductsByCategory } from '../lib/db';
 import { formatCurrencyGHS } from '../lib/formatCurrency';
 import { addToCart } from '../store/cartStore';
 
 export const CategoryListingPage: React.FC = () => {
 	const { category } = useParams<{ category: string }>();
-	const products = React.useMemo(() => {
-		const all = loadProducts();
-		return all.filter(p => p.category === (category as any));
+	const [products, setProducts] = React.useState<any[]>([]);
+	const [loading, setLoading] = React.useState(true);
+
+	React.useEffect(() => {
+		if (!category) return;
+		
+		setLoading(true);
+		listProductsByCategory(category)
+			.then((rows: any[]) => {
+				if (rows && rows.length) {
+					setProducts(rows.map(r => ({
+						id: r.id,
+						name: r.name,
+						price: Number(r.price),
+						imageUrl: r.image_url,
+						outOfStock: !!r.out_of_stock,
+					})));
+				} else {
+					setProducts([]);
+				}
+			})
+			.catch((error) => {
+				console.error('Error loading category products:', error);
+				setProducts([]);
+			})
+			.finally(() => {
+				setLoading(false);
+			});
 	}, [category]);
 
 	const title = React.useMemo(() => {
@@ -21,14 +46,23 @@ export const CategoryListingPage: React.FC = () => {
 	return (
 		<main className="container py-8">
 			<h1 className="text-xl font-semibold">{title}</h1>
-			{products.length === 0 ? (
+			{loading ? (
+				<p className="mt-4 text-sm text-black/60">Loading products...</p>
+			) : products.length === 0 ? (
 				<p className="mt-4 text-sm text-black/60">No items available in this category.</p>
 			) : (
 				<div className="mt-6 grid grid-cols-2 md:grid-cols-4 gap-6">
 					{products.map((p) => (
 						<article key={p.id} className="bg-white rounded-lg overflow-hidden border border-black/10">
 							<div className="relative aspect-[3/4] bg-muted overflow-hidden">
-								<img src={p.imageUrl} alt={p.name} className="w-full h-full object-cover" />
+								<img 
+									src={p.imageUrl} 
+									alt={p.name} 
+									className="w-full h-full object-cover"
+									onError={(e) => {
+										console.error('Failed to load product image:', p.imageUrl);
+									}}
+								/>
 								{p.outOfStock && (
 									<div className="absolute inset-0 bg-black/60 grid place-items-center">
 										<span className="text-white text-xs font-semibold uppercase tracking-wide">Out of Stock</span>
