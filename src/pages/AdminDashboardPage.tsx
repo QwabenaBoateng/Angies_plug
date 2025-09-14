@@ -79,17 +79,23 @@ export const AdminDashboardPage: React.FC = () => {
 			alert('Please enter a name and numeric price.');
 			return;
 		}
-		// Persist to Supabase DB so site can read it
-		if (formCategory === 'brand') {
-			await createBrand({ label: formName || 'Brand', imageUrl: pendingUrl });
-		} else if (formCategory === 'hero') {
-			await dbAddHeroImage(pendingUrl);
-		} else {
-			await createProduct({ name: formName || 'Hero Slide', price: Number.isNaN(priceNum) ? 0 : priceNum, imageUrl: pendingUrl, category: formCategory });
+		
+		try {
+			// Persist to Supabase DB so site can read it
+			if (formCategory === 'brand') {
+				await createBrand({ label: formName || 'Brand', imageUrl: pendingUrl });
+			} else if (formCategory === 'hero') {
+				await dbAddHeroImage(pendingUrl);
+			} else {
+				await createProduct({ name: formName || 'Hero Slide', price: Number.isNaN(priceNum) ? 0 : priceNum, imageUrl: pendingUrl, category: formCategory });
+			}
+			setPendingUrl(null);
+			setHeroImages(loadHeroImages());
+			alert('Saved. It will appear in the selected section on the site.');
+		} catch (error) {
+			console.error('Error saving to Supabase:', error);
+			alert(`Error saving: ${error.message || error}`);
 		}
-		setPendingUrl(null);
-		setHeroImages(loadHeroImages());
-		alert('Saved. It will appear in the selected section on the site.');
 	}
 
 	return (

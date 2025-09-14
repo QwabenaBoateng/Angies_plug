@@ -1,48 +1,92 @@
 import { supabase } from './supabaseClient';
 
 export async function listProductsByCategory(category: string) {
-  const variants = [category, category.toUpperCase(), category.charAt(0).toUpperCase() + category.slice(1)];
-  const orExpr = variants.map(v => `category.eq.${v}`).join(',');
-  const { data, error } = await supabase!
+  if (!supabase) {
+    console.warn('Supabase not configured, returning empty array');
+    return [];
+  }
+  const { data, error } = await supabase
     .from('products')
     .select('*')
-    .or(orExpr)
+    .eq('category', category)
     .order('created_at', { ascending: false });
-  if (error) throw error;
+  if (error) {
+    console.error('Error querying products:', error);
+    throw error;
+  }
   return data;
 }
 
 export async function createProduct(p: { name: string; price: number; imageUrl: string; category: string; }) {
-  const { error } = await supabase!
+  if (!supabase) {
+    throw new Error('Supabase not configured');
+  }
+  const { data, error } = await supabase
     .from('products')
-    .insert([{ name: p.name, price: p.price, image_url: p.imageUrl, category: p.category }]);
-  if (error) throw error;
+    .insert([{ name: p.name, price: p.price, image_url: p.imageUrl, category: p.category }])
+    .select();
+  if (error) {
+    console.error('Error creating product:', error);
+    throw error;
+  }
+  return data;
 }
 
 export async function deleteProduct(id: string) {
-  const { error } = await supabase!.from('products').delete().eq('id', id);
+  if (!supabase) {
+    throw new Error('Supabase not configured');
+  }
+  const { error } = await supabase.from('products').delete().eq('id', id);
   if (error) throw error;
 }
 
 export async function listBrands() {
-  const { data, error } = await supabase!.from('brands').select('*').order('created_at', { ascending: false });
-  if (error) throw error;
+  if (!supabase) {
+    console.warn('Supabase not configured, returning empty array');
+    return [];
+  }
+  const { data, error } = await supabase.from('brands').select('*').order('created_at', { ascending: false });
+  if (error) {
+    console.error('Error querying brands:', error);
+    throw error;
+  }
   return data;
 }
 
 export async function createBrand(b: { label: string; imageUrl: string }) {
-  const { error } = await supabase!.from('brands').insert([{ label: b.label, image_url: b.imageUrl }]);
-  if (error) throw error;
+  if (!supabase) {
+    throw new Error('Supabase not configured');
+  }
+  const { data, error } = await supabase.from('brands').insert([{ label: b.label, image_url: b.imageUrl }]).select();
+  if (error) {
+    console.error('Error creating brand:', error);
+    throw error;
+  }
+  return data;
 }
 
 export async function addHeroImage(url: string) {
-  const { error } = await supabase!.from('hero_images').insert([{ image_url: url }]);
-  if (error) throw error;
+  if (!supabase) {
+    throw new Error('Supabase not configured');
+  }
+  const { data, error } = await supabase.from('hero_images').insert([{ image_url: url }]).select();
+  if (error) {
+    console.error('Error adding hero image:', error);
+    throw error;
+  }
+  return data;
 }
 
 export async function listHeroImages() {
-  const { data, error } = await supabase!.from('hero_images').select('*').order('created_at', { ascending: false });
-  if (error) throw error;
+  if (!supabase) {
+    console.warn('Supabase not configured, returning empty array');
+    return [];
+  }
+  const { data, error } = await supabase.from('hero_images').select('*').order('created_at', { ascending: false });
+  if (error) {
+    console.error('Error querying hero images:', error);
+    throw error;
+  }
   return data?.map((r: any) => r.image_url) ?? [];
 }
 

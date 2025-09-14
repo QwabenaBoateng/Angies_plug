@@ -15,9 +15,14 @@ export const Hero: React.FC = () => {
 	useEffect(() => {
 		listHeroImages()
 			.then((arr) => {
-				if (arr && arr.length) setRemoteSlides(arr);
+				if (arr && arr.length) {
+					setRemoteSlides(arr);
+				}
 			})
-			.catch(console.error);
+			.catch((error) => {
+				console.error('Failed to load hero images:', error);
+				// Keep the default fallback images on error
+			});
 	}, []);
 
 	const goPrev = () => setIndex((i) => (i - 1 + remoteSlides.length) % remoteSlides.length);
@@ -40,6 +45,10 @@ export const Hero: React.FC = () => {
 						loading="eager"
 						decoding="sync"
 						className="absolute inset-0 w-full h-full object-cover object-center transition-opacity duration-700"
+						onError={(e) => {
+							console.error('Failed to load hero image:', remoteSlides[index]);
+							// You could set a fallback image here if needed
+						}}
 					/>
 					{/* Lighten the overlay so the image keeps its original clarity */}
 					<div className="absolute inset-0 bg-gradient-to-r from-white/40 via-white/10 to-transparent" />

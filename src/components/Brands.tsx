@@ -33,9 +33,15 @@ export const Brands: React.FC = () => {
 			.then((rows: any[]) => {
 				if (rows && rows.length) {
 					setList(rows.slice(0, 4).map(r => ({ label: r.label, image: r.image_url })));
+				} else {
+					// Keep fallback brands if no data from Supabase
+					console.log('No brands found in Supabase, using fallback brands');
 				}
 			})
-			.catch(console.error);
+			.catch((error) => {
+				console.error('Error loading brands:', error);
+				// Keep fallback brands on error
+			});
 	}, []);
 	return (
 		<section className="py-12">
@@ -45,7 +51,15 @@ export const Brands: React.FC = () => {
 					{list.map((b) => (
 						<div key={b.label} className="relative rounded-xl overflow-hidden border border-black/10">
 							<div className="aspect-[3/4]">
-								<img src={b.image} alt={b.label} className="w-full h-full object-cover" />
+								<img 
+									src={b.image} 
+									alt={b.label} 
+									className="w-full h-full object-cover" 
+									onError={(e) => {
+										console.error('Failed to load brand image:', b.image);
+										// You could set a fallback image here if needed
+									}}
+								/>
 							</div>
 							<div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
 							<div className="absolute inset-x-0 bottom-4 text-white text-3xl font-extrabold text-center drop-shadow">{b.label}</div>

@@ -54,9 +54,15 @@ import { listProductsByCategory } from '../lib/db';
 						image: r.image_url,
 						outOfStock: !!r.out_of_stock,
 					})));
+				} else {
+					// Keep fallback products if no data from Supabase
+					console.log('No featured products found in Supabase, using fallback products');
 				}
 			})
-			.catch(console.error);
+			.catch((error) => {
+				console.error('Error loading featured products:', error);
+				// Keep fallback products on error
+			});
 	}, []);
 
 	return (
@@ -67,7 +73,15 @@ import { listProductsByCategory } from '../lib/db';
 					{products.map((p) => (
 						<article key={p.id} className="bg-white rounded-lg overflow-hidden border border-black/10">
 							<div className="relative aspect-[3/4] bg-muted overflow-hidden">
-								<img src={p.image} alt={p.name} className="w-full h-full object-cover" />
+								<img 
+									src={p.image} 
+									alt={p.name} 
+									className="w-full h-full object-cover" 
+									onError={(e) => {
+										console.error('Failed to load product image:', p.image);
+										// You could set a fallback image here if needed
+									}}
+								/>
 								{p.outOfStock && (
 									<div className="absolute inset-0 bg-black/60 grid place-items-center">
 										<span className="text-white text-xs font-semibold uppercase tracking-wide">Out of Stock</span>

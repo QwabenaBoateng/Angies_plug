@@ -9,6 +9,7 @@ import { ContactPage } from './pages/ContactPage';
 import { CartPage } from './pages/CartPage';
 import { CategoryListingPage } from './pages/CategoryListingPage';
 import { AuthPage } from './pages/AuthPage';
+import { TestPage } from './pages/TestPage';
 
 const AppShell: React.FC = () => {
 	return (
@@ -23,6 +24,7 @@ const AppShell: React.FC = () => {
 					<Route path="/catalog/:category" element={<CategoryListingPage />} />
 					<Route path="/cart" element={<CartPage />} />
 					<Route path="/account" element={<AuthPage />} />
+					<Route path="/test" element={<TestPage />} />
 				</Routes>
 			</div>
 			<Footer />
